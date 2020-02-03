@@ -61,6 +61,11 @@ class Posting(models.Model):
         """
         pass
 
+    #Takes in a website url, and returns the url of a logo PNG
+    def load_logo_url(self, companyURL):
+        clearbitURL = "//logo.clearbit.com/" + companyURL + "?size=128&format=png"
+        return clearbitURL
+    
     def __str__(self):
         return '{:39}{:24}{:24}{}\t{:70}'.format(self.title[:35], self.company[:20],
                 self.city[:20], self.date_posted, self.url[:70])
