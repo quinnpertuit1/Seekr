@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date
 from PIL import Image, ImageDraw
+import urllib.request
 
 class Posting(models.Model):
     id = models.CharField(max_length=64, primary_key=True, editable=False)
@@ -61,10 +62,12 @@ class Posting(models.Model):
         """
         pass
 
-    #Takes in a website url, and returns the url of a logo PNG
-    def load_logo_url(self, companyURL):
+    #Takes in a website url, and returns the filename of the local file
+    def load_logo(self, company, companyURL):
         clearbitURL = "//logo.clearbit.com/" + companyURL + "?size=128&format=png"
-        return clearbitURL
+        imageFilename = company + ".png"
+        urllib.request.urlretrieve(clearbitURL, imageFilename)
+        return imageFilename
     
     def __str__(self):
         return '{:39}{:24}{:24}{}\t{:70}'.format(self.title[:35], self.company[:20],
