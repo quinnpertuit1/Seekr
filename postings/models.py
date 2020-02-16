@@ -2,6 +2,7 @@ from django.db import models
 from datetime import date
 from PIL import Image, ImageDraw
 import urllib.request
+import json
 
 class Posting(models.Model):
     id = models.CharField(max_length=64, primary_key=True, editable=False)
@@ -62,12 +63,25 @@ class Posting(models.Model):
         """
         pass
 
-    #Takes in a website url, and returns the filename of the local file
-    def load_logo(self, company, companyURL):
-        clearbitURL = "//logo.clearbit.com/" + companyURL + "?size=128&format=png"
+    #Takes in a company name, uploads the file to S3, and returns the s3 url
+    def load_logo(self, company):
+        #Get company autocomplete and values
+        url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=" + company
+        searchResult = urllib.request.urlopen(url)
+        data = searchResult.read()
+        encodedData = searchResult.info().get_content_charset('utf-8')
+        resultingData = json.loads(data.decode(encodedData))
+        
+        #Download Logo locally
+        firstResult = resultingData[0]
+        clearbitURL = firstResult["logo"]
         imageFilename = company + ".png"
         urllib.request.urlretrieve(clearbitURL, imageFilename)
-        return imageFilename
+        
+        #Upload to S3 and delete local image
+        s3url = ""
+        
+        return s3url
     
     def __str__(self):
         return '{:39}{:24}{:24}{}\t{:70}'.format(self.title[:35], self.company[:20],
