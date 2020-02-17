@@ -66,7 +66,7 @@ class Posting(models.Model):
         pass
 
     #Takes in a company name and bucket location for upload
-    #and uploads the file to S3, and returns the s3 file name
+    #and uploads the file to S3, and returns the s3 url
     def load_logo(self, company, bucket):
         #Get company autocomplete and values
         url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=" + company
@@ -92,7 +92,9 @@ class Posting(models.Model):
         #Delete local image
         os.remove(imageFilename)
         
-        return imageFilename
+        s3Url = "https://" + bucket + ".s3-us-east-1.amazonaws.com/" + imageFilename
+        
+        return s3Url
     
     def __str__(self):
         return '{:39}{:24}{:24}{}\t{:70}'.format(self.title[:35], self.company[:20],
