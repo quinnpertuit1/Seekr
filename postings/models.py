@@ -3,6 +3,8 @@ from datetime import date
 from PIL import Image, ImageDraw
 import urllib.request
 import json
+import boto3
+import os
 
 class Posting(models.Model):
     id = models.CharField(max_length=64, primary_key=True, editable=False)
@@ -63,8 +65,9 @@ class Posting(models.Model):
         """
         pass
 
-    #Takes in a company name, uploads the file to S3, and returns the s3 url
-    def load_logo(self, company):
+    #Takes in a company name and bucket location for upload
+    #and uploads the file to S3, and returns the s3 file name
+    def load_logo(self, company, bucket):
         #Get company autocomplete and values
         url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=" + company
         searchResult = urllib.request.urlopen(url)
@@ -73,15 +76,22 @@ class Posting(models.Model):
         resultingData = json.loads(data.decode(encodedData))
         
         #Download Logo locally
-        firstResult = resultingData[0]
-        clearbitURL = firstResult["logo"]
-        imageFilename = company + ".png"
-        urllib.request.urlretrieve(clearbitURL, imageFilename)
+        for item in resultingData: 
+            clearbitURL = item["logo"]
+            imageFilename = company + ".png"
+            urllib.request.urlretrieve(clearbitURL, imageFilename)
         
-        #Upload to S3 and delete local image
-        s3url = ""
+        ACCESS_KEY = os.environ['ACCESS_KEY']
+        SECRET_KEY = os.environ['SECRET_KEY']
         
-        return s3url
+        #Upload to S3
+        s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+        s3.upload_file(imageFilename, bucket, imageFilename)
+        
+        #Delete local image
+        os.remove(imageFilename)
+        
+        return imageFilename
     
     def __str__(self):
         return '{:39}{:24}{:24}{}\t{:70}'.format(self.title[:35], self.company[:20],
