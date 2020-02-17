@@ -80,6 +80,7 @@ class Posting(models.Model):
             clearbitURL = item["logo"]
             imageFilename = company + ".png"
             urllib.request.urlretrieve(clearbitURL, imageFilename)
+            break
         
         ACCESS_KEY = os.environ['ACCESS_KEY']
         SECRET_KEY = os.environ['SECRET_KEY']
