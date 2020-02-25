@@ -5,6 +5,7 @@ import urllib.request
 import json
 import boto3
 import os
+from constants import *
 
 class Posting(models.Model):
     id = models.CharField(max_length=64, primary_key=True, editable=False)
@@ -94,9 +95,6 @@ class Posting(models.Model):
         clearbitURL = item["logo"]
         imageFilename = company + ".png"
         urllib.request.urlretrieve(clearbitURL, imageFilename)
-        
-        ACCESS_KEY = os.environ['ACCESS_KEY']
-        SECRET_KEY = os.environ['SECRET_KEY']
         
         #Upload to S3
         s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
