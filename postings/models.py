@@ -68,6 +68,20 @@ class Posting(models.Model):
     #Takes in a company name and bucket location for upload
     #and uploads the file to S3, and returns the s3 url
     def load_logo(self, company, bucket):
+        """Loads a company logo based on company name
+
+        Queries bitbucket api to find a logo from partial company names, and saves the logo url to s3. 
+
+        Args:
+            company (string): The company name to find the logo for
+
+        Returns:
+            Returns the URL that a user can query to get the logo from S3. 
+        """
+        
+        #Declare Bucket to save to
+        bucket = "tempBucketString"
+        
         #Get company autocomplete and values
         url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=" + company
         searchResult = urllib.request.urlopen(url)
@@ -76,11 +90,10 @@ class Posting(models.Model):
         resultingData = json.loads(data.decode(encodedData))
         
         #Download Logo locally
-        for item in resultingData: 
-            clearbitURL = item["logo"]
-            imageFilename = company + ".png"
-            urllib.request.urlretrieve(clearbitURL, imageFilename)
-            break
+        item = resultingData[0]
+        clearbitURL = item["logo"]
+        imageFilename = company + ".png"
+        urllib.request.urlretrieve(clearbitURL, imageFilename)
         
         ACCESS_KEY = os.environ['ACCESS_KEY']
         SECRET_KEY = os.environ['SECRET_KEY']
