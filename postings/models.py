@@ -7,6 +7,8 @@ import boto3
 import os
 from constants import *
 from global_variables import *
+import requests
+from io import BytesIO
 
 class Posting(models.Model):
     id = models.CharField(max_length=64, primary_key=True, editable=False)
@@ -98,16 +100,15 @@ class Posting(models.Model):
         encodedData = searchResult.info().get_content_charset('utf-8')
         resultingData = json.loads(data.decode(encodedData))
         
-        #Download Logo locally
+        #Create byte buffer representing logo image
+        #In the new form of upload, you need to do Image.open(byteBuffer) to access the image itself
         item = resultingData[0]
         clearbitURL = item["logo"]
-        urllib.request.urlretrieve(clearbitURL, imageFilename)
+        logoResponse = requests.get(clearbitURL)
+        byteBuffer = BytesIO(logoResponse.content)
         
         #Upload to S3
-        s3.upload_file(imageFilename, bucket, imageFilename)
-        
-        #Delete local image
-        os.remove(imageFilename)
+        s3.upload_fileobj(byteBuffer, bucket, imageFilename)
         
         s3Url = "https://" + bucket + ".s3-us-east-1.amazonaws.com/" + imageFilename
         
