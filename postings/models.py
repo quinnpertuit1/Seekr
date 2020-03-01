@@ -103,7 +103,6 @@ class Posting(models.Model):
         urllib.request.urlretrieve(clearbitURL, imageFilename)
         
         #Upload to S3
-        s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
         s3.upload_file(imageFilename, bucket, imageFilename)
         
         #Delete local image
