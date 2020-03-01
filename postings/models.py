@@ -6,6 +6,7 @@ import json
 import boto3
 import os
 from constants import *
+from global_variables import *
 
 class Posting(models.Model):
     id = models.CharField(max_length=64, primary_key=True, editable=False)
