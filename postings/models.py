@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw
 import urllib.request
 import json
 import boto3
+import botocore
 import os
 from constants import *
 from global_variables import *
@@ -91,7 +92,12 @@ class Posting(models.Model):
         imageFilename = company + ".png"
         s3UrlAttempt = "https://" + bucket + ".s3-us-east-1.amazonaws.com/" + imageFilename
         #Use url to check if already in s3
-        #... Still in progress
+        isPresent = False
+        
+        
+        
+        if isPresent:
+            return s3UrlAttempt
         
         #Get company autocomplete and values
         url = "https://autocomplete.clearbit.com/v1/companies/suggest?query=" + company
