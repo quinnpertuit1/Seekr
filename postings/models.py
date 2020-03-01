@@ -92,9 +92,13 @@ class Posting(models.Model):
         imageFilename = company + ".png"
         s3UrlAttempt = "https://" + bucket + ".s3-us-east-1.amazonaws.com/" + imageFilename
         #Use url to check if already in s3
-        isPresent = False
+        isPresent = True
         
-        
+        s3Resource = boto3.resource('s3')
+        try:
+            s3Resource.Object(bucket, imageFilename).load()
+        except botocore.exceptions.ClientError as error:
+            isPresent = False
         
         if isPresent:
             return s3UrlAttempt
