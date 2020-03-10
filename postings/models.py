@@ -86,7 +86,7 @@ class Posting(models.Model):
         
         
         #Declare Bucket to save to
-        bucket = "tempBucketString"
+        bucket = "seekr-company-logo-image"
         
         #Check if url is already in s3
         imageFilename = company + ".png"
